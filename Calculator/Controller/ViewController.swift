@@ -11,7 +11,6 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var displayLabel: UILabel!
-    @IBOutlet weak var acButton: UIButton!
     
     private var isFinishedTypingNumber: Bool = true
     
@@ -24,29 +23,32 @@ class ViewController: UIViewController {
         }
         
         set {
-            displayLabel.text = String(newValue)
+            let isInt = floor(newValue) == newValue
+             
+                if isInt {
+                    // Remove the .0
+                    displayLabel.text = String(format: "%.0f", newValue)
+                } else {
+                    displayLabel.text = String(newValue)
+                }
         }
     }
+    
+    private var calculator = CalculatorLogic()
     
     @IBAction func calcButtonPressed(_ sender: UIButton) {
         
         //What should happen when a non-number button is pressed
         isFinishedTypingNumber = true
         
+        calculator.setNumber(displayValue)
+        
         if let calcMethod = sender.currentTitle {
-            switch calcMethod {
-            case "+/-":
-                displayValue = displayValue * -1
-            case "AC":
-                displayLabel.text = "0"
-            case "C":
-                displayLabel.text = "0"
-                acButton.setTitle("AC", for: .normal)
-            case "%":
-                displayValue = displayValue / 100
-            default:
-                break
+            
+            if let result = calculator.calculate(with: calcMethod) {
+                displayValue = result
             }
+            
         }
         
     }
@@ -59,7 +61,6 @@ class ViewController: UIViewController {
         if let numValue = sender.currentTitle {
             
             if isFinishedTypingNumber == true {
-                acButton.setTitle("C", for: .normal)
                 displayLabel.text = numValue
                 isFinishedTypingNumber = false
             } else {
